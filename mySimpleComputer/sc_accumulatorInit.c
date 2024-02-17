@@ -1,7 +1,8 @@
 extern unsigned int Accumulator;
 
-int sc_accumulatorInit (void)
+int
+sc_accumulatorInit (void)
 {
-    Accumulator = 0;
-    return 0;
+  Accumulator = 0;
+  return 0;
 }

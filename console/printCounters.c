@@ -1,7 +1,8 @@
 #include <stdio.h>
 extern unsigned int Icounter;
 
-void printCounters (void)
+void
+printCounters (void)
 {
-    printf("%u\n", Icounter);
+  printf ("%u\n", Icounter);
 }
