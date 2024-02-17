@@ -1,5 +1,5 @@
-#include "SC.h"
 #include "pr01.h"
+#include "SC.h"
 
 int
 main ()
@@ -31,7 +31,7 @@ main ()
       if (sc_memorySet ((rand () % SIZE), rand () % 0x8000) != 0)
         printf ("Ошибка при инициализации памяти\n");
     }
-  
+
   for (int i = 0; i < SIZE; i++)
     {
       if (i % 10 == 0)
