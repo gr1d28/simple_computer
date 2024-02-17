@@ -26,7 +26,10 @@ int main()
     }
 
     for(int i = 0; i < 10; i++)
-        sc_memorySet((rand() % SIZE), rand());
+    {
+        if(sc_memorySet((rand() % SIZE), rand() % 0x8000) != 0)
+            printf("Ошибка при инициализации памяти\n");
+    }
     
     for(int i = 0; i < SIZE; i++)
     {
@@ -35,6 +38,9 @@ int main()
         printf("%d ", RAM[i]);
     }
     printf("\n");
+
+    if(sc_memorySet(22, 0x8400) != 0)
+        printf("Недопустимое значение памяти\n");
 
     printFlags();
     sc_regSet(1, 1);
