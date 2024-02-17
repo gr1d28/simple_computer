@@ -1,6 +1,6 @@
 extern unsigned int Icounter;
 
-int 
+int
 sc_icounterInit (void)
 {
   Icounter = 0;

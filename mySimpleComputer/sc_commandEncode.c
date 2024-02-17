@@ -1,5 +1,5 @@
 int
-sc_commandEncode (int sign, int command, int operand, int * value)
+sc_commandEncode (int sign, int command, int operand, int *value)
 {
   int res = 0;
   if (operand >= 0x80 || command >= 0x80 || (sign != 0 && sign != 1) || !value)

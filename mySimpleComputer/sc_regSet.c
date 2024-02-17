@@ -8,34 +8,34 @@ extern char REG;
 int
 sc_regSet (int registers, int value)
 {
-	char ans = 0x0;
-	if (registers > 5 || registers <= 0)
-		return -1;
-	switch (registers)
-		{
-		case 1:
-			ans = MASK1;
-			break;
-		case 2:
-			ans = MASK2;
-			break;
-		case 3:
-			ans = MASK3;
-			break;
-		case 4:
-			ans = MASK4;
-			break;
-		case 5:
-			ans = MASK5;
-			break;
-	
-		default:
-			break;
-		}
-	if (value)
-		REG = REG | ans;
-	else
-		REG = REG & ~(ans);
-	
-	return 0;
+  char ans = 0x0;
+  if (registers > 5 || registers <= 0)
+    return -1;
+  switch (registers)
+    {
+    case 1:
+      ans = MASK1;
+      break;
+    case 2:
+      ans = MASK2;
+      break;
+    case 3:
+      ans = MASK3;
+      break;
+    case 4:
+      ans = MASK4;
+      break;
+    case 5:
+      ans = MASK5;
+      break;
+
+    default:
+      break;
+    }
+  if (value)
+    REG = REG | ans;
+  else
+    REG = REG & ~(ans);
+
+  return 0;
 }

@@ -1,6 +1,6 @@
 #define DEC_MASK 0x7F
 int
-sc_commandDecode (int value, int * sign, int * command, int * operand)
+sc_commandDecode (int value, int *sign, int *command, int *operand)
 {
   int res = value;
   if (!sign || !command || !operand)

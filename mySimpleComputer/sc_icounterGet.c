@@ -1,7 +1,7 @@
 extern unsigned int Icounter;
 
 int
-sc_icounterGet (int * value)
+sc_icounterGet (int *value)
 {
   if (!value)
     return -1;
