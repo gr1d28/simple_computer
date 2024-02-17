@@ -12,7 +12,7 @@ sc_memoryLoad (char *filename)
       fclose (fp);
       return -1;
     }
-    
+
   if (fread (buf, sizeof (int), SIZE, fp) != SIZE)
     {
       fclose (fp);

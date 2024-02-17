@@ -11,7 +11,7 @@ sc_memorySave (char *filename)
       fclose (fp);
       return -1;
     }
-    
+
   if (fwrite (RAM, sizeof (int), SIZE, fp) != SIZE)
     {
       fclose (fp);
