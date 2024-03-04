@@ -1,17 +1,32 @@
+#include "MT.h"
+#include "SC.h"
 #include <stdio.h>
-extern char REG;
+#include <unistd.h>
 
 void
 printFlags (void)
 {
-  char flags = REG;
-  char names[5] = { 'E', 'T', 'M', '0', 'P' };
-  for (int i = 4; i >= 0; i--)
+  char names[5] = { 'P', '0', 'M', 'T', 'E' };
+  char buf[5];
+  int start = 82;
+  int value = 0;
+  for (int i = 0; i < 5; i++)
     {
-      if (((flags >> i) & 0x1) == 1)
-        printf ("%c", names[i]);
+      sc_regGet (i + 1, &value);
+      if (value)
+        buf[i] = names[i];
       else
-        printf ("_");
+        buf[i] = '_';
+      value = 0;
     }
-  printf ("\n");
+  mt_gotoXY (0, start);
+  write (1, buf, 5);
 }
+
+// int main()
+// {
+//   sc_regInit();
+//   sc_regSet(5, 1);
+//   printFlags();
+//   return 0;
+// }

@@ -1,9 +1,3 @@
-extern int SIZE;
-extern int RAM[];
-extern char REG;
-extern unsigned int Accumulator;
-extern unsigned int Icounter;
-
 int sc_accumulatorGet (int *value);
 
 int sc_accumulatorInit (void);

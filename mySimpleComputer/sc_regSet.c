@@ -1,9 +1,9 @@
 extern char REG;
-#define MASK1 0x1
-#define MASK2 0x2
+#define MASK5 0x1
+#define MASK4 0x2
 #define MASK3 0x4
-#define MASK4 0x8
-#define MASK5 0x10
+#define MASK2 0x8
+#define MASK1 0x10
 
 int
 sc_regSet (int registers, int value)

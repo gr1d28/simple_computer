@@ -1,0 +1,7 @@
+clear=\E[H\E[2J
+cursor_address=\E[%i%p1%d;%p2%dH
+set_a_background=\E[4%p1%dm
+set_a_foreground=\E[3%p1%dm
+cursor_visible=\E[?25h\E[?8c
+cursor_invisible=\E[?25l\E[?1c
+delete_line=\E[M

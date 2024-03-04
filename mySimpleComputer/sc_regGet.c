@@ -4,7 +4,7 @@ int
 sc_regGet (int registers, int *value)
 {
   int ans = 0;
-  if (registers > 5 || registers < 0 || !value)
+  if (registers > 5 || registers <= 0 || !value)
     return -1;
 
   switch (registers)

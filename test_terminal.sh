@@ -1,0 +1,8 @@
+echo -e "\E[H\E[2J"
+echo -e "\E[31m"
+echo -en "\E[5;10H" "Егор"
+echo -en "\E[32m"
+echo -en "\E[47m"
+echo -en "\E[6;8H" "ИВ-221"
+echo -en "\E[49m" "\E[37m"
+echo -en "\E[10;1H" "test"
