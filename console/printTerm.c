@@ -50,13 +50,11 @@ printTerm (int address, int input)
   strncpy (third, second, 9);
   strncpy (second, first, 9);
   strncpy (first, this, 9);
-  sprintf (this, "%d> ", address);
+  value = address;
+  this[1] = translate (value & MASK);
+  value = value >> 4;
+  this[0] = translate (value & MASK);
 
-  this[1] = translate (address & MASK);
-  address = address >> 4;
-  this[0] = translate (address & MASK);
-  this[2] = '>';
-  this[3] = ' ';
   if (input == 0)
     {
       sc_memoryGet (address, &value);

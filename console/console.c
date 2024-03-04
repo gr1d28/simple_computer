@@ -31,6 +31,7 @@ main ()
   sc_regInit ();
   for (int i = 0; i < SIZE; i++)
     {
+      sc_memorySet (i, i);
       if (i == 4)
         printCell (4, 0, 7);
       else
@@ -43,5 +44,18 @@ main ()
   sc_memoryGet (4, &value);
   printDecodedCommand (value);
   printTerm (4, 0);
+  int k = 1;
+  for (int i = 4; i < SIZE; i++)
+    {
+      printTerm (i, 0);
+      printCell (i, 0, 7);
+      printCell (i - 1, fg, bg);
+      sc_memoryGet (i, &value);
+      printDecodedCommand (value);
+      sc_icounterSet (k);
+      printCounters ();
+      k++;
+      sleep (1);
+    }
   return 0;
 }
