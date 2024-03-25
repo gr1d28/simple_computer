@@ -1,8 +1,8 @@
 #include "console.h"
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <fcntl.h>
 extern int SIZE;
 
 int
@@ -17,41 +17,41 @@ main (int argc, char *argv[])
   mt_clrscr ();
   if (!isatty (1))
     {
-      write(2, "Дескриптор не связан с файлом терминала\n", 75);
+      write (2, "Дескриптор не связан с файлом терминала\n", 75);
       return -1;
     }
   if (mt_getscreensize (&rows, &cols) != 0)
     {
-      write(2, "Невозможно получить размер экрана терминала\n", 84);
+      write (2, "Невозможно получить размер экрана терминала\n", 84);
       return -1;
     }
   if (rows < 26 || cols < 100)
     {
-      write(2, "Недостаточный размер экрана терминала\n", 73);
+      write (2, "Недостаточный размер экрана терминала\n", 73);
       return -1;
     }
-  if(argc == 2)
-  {
-    fd = open(argv[1], O_RDONLY);
-    if(fd == -1)
+  if (argc == 2)
     {
-      write(2, "Не удалось открыть указанный файл шрифтов\n", 79);
-      return -1;
+      fd = open (argv[1], O_RDONLY);
+      if (fd == -1)
+        {
+          write (2, "Не удалось открыть указанный файл шрифтов\n", 79);
+          return -1;
+        }
     }
-  }
   else
-  {
-    font();
-    fd = open(font_file_name, O_RDONLY);
-    if(fd == -1)
     {
-      write(2, "Не удалось открыть файл font.bin\n", 54);
-      return -1;
+      font ();
+      fd = open (font_file_name, O_RDONLY);
+      if (fd == -1)
+        {
+          write (2, "Не удалось открыть файл font.bin\n", 54);
+          return -1;
+        }
     }
-  }
 
-  bc_bigcharread(fd, numbers, 18, &check_numbers);
-  close(fd);
+  bc_bigcharread (fd, numbers, 18, &check_numbers);
+  close (fd);
   // printBigCell(numbers, size, 15);
   sc_accumulatorInit ();
   sc_icounterInit ();
@@ -65,7 +65,7 @@ main (int argc, char *argv[])
       else
         printCell (i, fg, bg);
     }
-  bc_box(1, 1, 13, 60, 7, 9, "RAM", 1, 9);
+  bc_box (1, 1, 13, 60, 7, 9, "RAM", 1, 9);
   printAccumulator ();
   printFlags ();
   printCounters ();
@@ -81,10 +81,10 @@ main (int argc, char *argv[])
       printCell (i - 1, fg, bg);
       sc_memoryGet (i, &value);
       printDecodedCommand (value);
-      printBigCell(numbers, size, value, i);
+      printBigCell (numbers, size, value, i);
       sc_icounterSet (k);
       printCounters ();
-      printCommand();
+      printCommand ();
       k++;
       sleep (1);
     }
