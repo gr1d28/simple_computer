@@ -5,3 +5,7 @@ set_a_foreground=\E[3%p1%dm
 cursor_visible=\E[?25h\E[?8c
 cursor_invisible=\E[?25l\E[?1c
 delete_line=\E[M
+enter_alt_charset_mode=\E(0
+exit_alt_charset_mode=\E(B
+acs_chars=++\054\054--..00__``aaffgg  h hiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}c~~
+          ++,    ,  --..00__▒▒°°±±␤␤␋␋┘┘┐┐┌┌└└┼┼⎺⎺⎻⎻──⎼⎼ ⎽⎽├├┤┤┴┴┬┬││≤≤≥≥ππ≠≠££␌··

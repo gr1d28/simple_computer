@@ -1,5 +1,6 @@
 #include "MT.h"
 #include "SC.h"
+#include "BC.h"
 #include <stdio.h>
 #include <unistd.h>
 #define MASK 0xF
@@ -12,9 +13,10 @@ printAccumulator (void)
   int accumulator, k;
   char sc[4] = { 's', 'c', ':', ' ' };
   char hex[5] = { 'h', 'e', 'x', ':', ' ' };
+  // char header[12] = {'А', 'к', 'к', 'у', 'м', 'у', 'л', 'я', 'т', 'о', 'р', '\0'};
   char sc_buf[5];
   char hex_buf[4];
-  int col = 60;
+  int col = 65;
   sc_accumulatorGet (&accumulator);
   k = accumulator;
   if (k >> 15)
@@ -27,19 +29,12 @@ printAccumulator (void)
       sc_buf[i + 1] = hex_buf[i] = translate (k & MASK);
       k = k >> 4;
     }
-  mt_gotoXY (0, col);
+  bc_box(1, col - 2, 1, 21, 7, 9, "Accumulator", 1, 9);
+  mt_gotoXY (2, col);
   write (1, sc, 4);
   write (1, sc_buf, 5);
   col += 10;
-  mt_gotoXY (0, col);
+  mt_gotoXY (2, col);
   write (1, hex, 5);
   write (1, hex_buf, 4);
 }
-
-// int main()
-// {
-//   sc_accumulatorInit();
-//   sc_accumulatorSet(56);
-//   printAccumulator();
-//   return 0;
-// }

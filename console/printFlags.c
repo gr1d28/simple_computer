@@ -1,5 +1,6 @@
 #include "MT.h"
 #include "SC.h"
+#include "BC.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -8,7 +9,7 @@ printFlags (void)
 {
   char names[5] = { 'P', '0', 'M', 'T', 'E' };
   char buf[5];
-  int start = 82;
+  int start = 94;
   int value = 0;
   for (int i = 0; i < 5; i++)
     {
@@ -19,14 +20,7 @@ printFlags (void)
         buf[i] = '_';
       value = 0;
     }
-  mt_gotoXY (0, start);
+  bc_box(1, start - 8, 1, 21, 7, 9, "Аlag register", 1, 9);
+  mt_gotoXY (2, start);
   write (1, buf, 5);
 }
-
-// int main()
-// {
-//   sc_regInit();
-//   sc_regSet(5, 1);
-//   printFlags();
-//   return 0;
-// }

@@ -1,3 +1,4 @@
+#ifndef MT
 typedef struct WS
 {
   unsigned short ws_row;
@@ -18,6 +19,8 @@ typedef enum CL
   white,
   grey
 } color;
+#define MT
+#endif
 
 int mt_clrscr (void);
 
