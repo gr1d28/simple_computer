@@ -1,6 +1,6 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
-#include "BC.h"
 
 void printAccumulator (void);
 
@@ -16,6 +16,6 @@ void printFlags (void);
 
 void printTerm (int address, int input);
 
-int font();
+int font ();
 
 void printBigCell (int *big, int size, int value, int number);

@@ -19,7 +19,8 @@ printCell (int address, color fg, color bg)
         k++;
       mt_setbgcolor (bg);
       mt_setfgcolor (fg);
-      mt_gotoXY ((address / str_size) + 2, ((address % str_size) * size) + k + 2);
+      mt_gotoXY ((address / str_size) + 2,
+                 ((address % str_size) * size) + k + 2);
       sc_memoryGet (address, &value);
       write (1, "+", 1);
       for (int i = 0; i < 4; i++)

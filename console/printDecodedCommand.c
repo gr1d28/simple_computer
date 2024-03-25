@@ -1,7 +1,7 @@
+#include "BC.h"
 #include "MT.h"
 #include <stdio.h>
 #include <unistd.h>
-#include "BC.h"
 #define BINMASK 0x1
 #define OCTMASK 0x7
 #define HEXMASK 0xF
@@ -42,7 +42,8 @@ printDecodedCommand (int value)
       hex_buf[i] = translate (k & HEXMASK);
       k = k >> 4;
     }
-  bc_box(str - 1, col - 2, 1, 60, 7, 9, "Editable memory cell (format)", 1, 7);
+  bc_box (str - 1, col - 2, 1, 60, 7, 9, "Editable memory cell (format)", 1,
+          7);
   mt_gotoXY (str, col);
   write (1, dec, 5);
   write (1, dec_buf, 5);

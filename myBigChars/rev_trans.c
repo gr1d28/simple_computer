@@ -1,7 +1,8 @@
-int rev_trans(char c)
+int
+rev_trans (char c)
 {
-  switch(c)
-  {
+  switch (c)
+    {
     case '0':
       return 0;
     case '1':
@@ -34,5 +35,5 @@ int rev_trans(char c)
       return 14;
     case 'F':
       return 15;
-  }
+    }
 }

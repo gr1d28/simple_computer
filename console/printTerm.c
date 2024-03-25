@@ -1,6 +1,6 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
-#include "BC.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -66,7 +66,7 @@ printTerm (int address, int input)
           value = value >> 4;
         }
     }
-  bc_box(str - 1, col - 1, 4, 9, 7, 9, "IN--OUT", 2, 7);
+  bc_box (str - 1, col - 1, 4, 9, 7, 9, "IN--OUT", 2, 7);
   mt_gotoXY (str, col);
   write (1, this, 10);
   str++;

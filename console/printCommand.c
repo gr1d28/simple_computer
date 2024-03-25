@@ -1,6 +1,6 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
-#include "BC.h"
 #include <stdio.h>
 #include <unistd.h>
 #define MASK 0xF
@@ -28,8 +28,8 @@ printCommand (void)
   buf[9] = translate (operand & MASK);
   operand = operand >> 4;
   buf[8] = translate (operand & MASK);
-  
-  bc_box(str - 1, col - 5, 1, 21, 7, 9, "Command", 1, 9);
+
+  bc_box (str - 1, col - 5, 1, 21, 7, 9, "Command", 1, 9);
   mt_gotoXY (str, col);
   write (1, buf, 10);
 }

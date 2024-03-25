@@ -1,6 +1,6 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
-#include "BC.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -20,7 +20,7 @@ printFlags (void)
         buf[i] = '_';
       value = 0;
     }
-  bc_box(1, start - 8, 1, 21, 7, 9, "Аlag register", 1, 9);
+  bc_box (1, start - 8, 1, 21, 7, 9, "Аlag register", 1, 9);
   mt_gotoXY (2, start);
   write (1, buf, 5);
 }
