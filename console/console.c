@@ -1,30 +1,58 @@
 #include "console.h"
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 extern int SIZE;
 
 int
-main ()
+main (int argc, char *argv[])
 {
   int rows, cols, value;
+  int size = 18 * 2, fd;
+  char *font_file_name = "font.bin";
+  int numbers[size];
+  int check_numbers = 0;
   color fg = 1, bg = 0;
+  mt_clrscr ();
   if (!isatty (1))
     {
-      printf ("Дескриптор не связан с файлом терминала\n");
+      write (2, "Дескриптор не связан с файлом терминала\n", 75);
       return -1;
     }
   if (mt_getscreensize (&rows, &cols) != 0)
     {
-      printf ("Невозможно получить размер экрана терминала\n");
+      write (2, "Невозможно получить размер экрана терминала\n", 84);
       return -1;
     }
   if (rows < 26 || cols < 100)
     {
-      printf ("Недостаточный размер экрана терминала\n");
+      write (2, "Недостаточный размер экрана терминала\n", 73);
       return -1;
     }
-  mt_clrscr ();
+  if (argc == 2)
+    {
+      fd = open (argv[1], O_RDONLY);
+      if (fd == -1)
+        {
+          write (2, "Не удалось открыть указанный файл шрифтов\n", 79);
+          return -1;
+        }
+    }
+  else
+    {
+      font ();
+      fd = open (font_file_name, O_RDONLY);
+      if (fd == -1)
+        {
+          write (2, "Не удалось открыть файл font.bin\n", 54);
+          return -1;
+        }
+    }
+
+  bc_bigcharread (fd, numbers, 18, &check_numbers);
+  close (fd);
+  // printBigCell(numbers, size, 15);
   sc_accumulatorInit ();
   sc_icounterInit ();
   sc_memoryInit ();
@@ -37,6 +65,7 @@ main ()
       else
         printCell (i, fg, bg);
     }
+  bc_box (1, 1, 13, 60, 7, 9, "RAM", 1, 9);
   printAccumulator ();
   printFlags ();
   printCounters ();
@@ -52,8 +81,10 @@ main ()
       printCell (i - 1, fg, bg);
       sc_memoryGet (i, &value);
       printDecodedCommand (value);
+      printBigCell (numbers, size, value, i);
       sc_icounterSet (k);
       printCounters ();
+      printCommand ();
       k++;
       sleep (1);
     }

@@ -1,3 +1,4 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
 #include <stdio.h>
@@ -8,7 +9,7 @@ char translate (int value);
 void
 printTerm (int address, int input)
 {
-  int value = 0, str = 18, col = 61;
+  int value = 0, str = 19, col = 65;
   static int c = 1;
   static char this[9] = { '0', '3', '>', ' ' };
   static char first[9] = { '0', '2', '>', ' ' };
@@ -65,7 +66,7 @@ printTerm (int address, int input)
           value = value >> 4;
         }
     }
-
+  bc_box (str - 1, col - 1, 4, 9, 7, 9, "IN--OUT", 2, 7);
   mt_gotoXY (str, col);
   write (1, this, 10);
   str++;

@@ -1,3 +1,4 @@
+#include "BC.h"
 #include "MT.h"
 #include "SC.h"
 #include <stdio.h>
@@ -9,7 +10,7 @@ void
 printCommand (void)
 {
   char buf[10];
-  int icount_value, mem_value, sign, command, operand, str = 4, col = 82;
+  int icount_value, mem_value, sign, command, operand, str = 5, col = 91;
   sc_icounterGet (&icount_value);
   if (sc_memoryGet (icount_value, &mem_value) != 0)
     buf[0] = '!';
@@ -27,6 +28,8 @@ printCommand (void)
   buf[9] = translate (operand & MASK);
   operand = operand >> 4;
   buf[8] = translate (operand & MASK);
+
+  bc_box (str - 1, col - 5, 1, 21, 7, 9, "Command", 1, 9);
   mt_gotoXY (str, col);
   write (1, buf, 10);
 }

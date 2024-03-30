@@ -1,3 +1,4 @@
+#include "BC.h"
 #include "MT.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -19,7 +20,7 @@ printDecodedCommand (int value)
   char dec_buf[5] = { '0', '0', '0', '0', '0' };
   char hex_buf[4];
   int k = value;
-  int str = 18, col = 0;
+  int str = 19, col = 3;
   for (int i = 14; i >= 0; i--)
     {
       if (k & BINMASK)
@@ -41,6 +42,8 @@ printDecodedCommand (int value)
       hex_buf[i] = translate (k & HEXMASK);
       k = k >> 4;
     }
+  bc_box (str - 1, col - 2, 1, 60, 7, 9, "Editable memory cell (format)", 1,
+          7);
   mt_gotoXY (str, col);
   write (1, dec, 5);
   write (1, dec_buf, 5);
@@ -57,9 +60,3 @@ printDecodedCommand (int value)
   write (1, bin, 5);
   write (1, bin_buf, 15);
 }
-
-// int main()
-// {
-//   printDecodedCommand(256);
-//   return 0;
-// }
