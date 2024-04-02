@@ -54,7 +54,6 @@ main (int argc, char *argv[])
 
   bc_bigcharread (fd, numbers, 18, &check_numbers);
   close (fd);
-  // printBigCell(numbers, size, 15);
   sc_accumulatorInit ();
   sc_icounterInit ();
   sc_memoryInit ();
@@ -288,6 +287,6 @@ main (int argc, char *argv[])
 
   rk_mytermrestore ();
   mt_delline ();
-  
+
   return 0;
 }
