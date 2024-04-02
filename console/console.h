@@ -1,4 +1,5 @@
 #include "BC.h"
+#include "MR.h"
 #include "MT.h"
 #include "SC.h"
 
@@ -19,3 +20,5 @@ void printTerm (int address, int input);
 int font ();
 
 void printBigCell (int *big, int size, int value, int number);
+
+void printKeys (void);

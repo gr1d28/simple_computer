@@ -21,6 +21,7 @@ printDecodedCommand (int value)
   char hex_buf[4];
   int k = value;
   int str = 19, col = 3;
+  sprintf (dec_buf, "%d", value);
   for (int i = 14; i >= 0; i--)
     {
       if (k & BINMASK)
@@ -30,13 +31,12 @@ printDecodedCommand (int value)
       k = k >> 1;
     }
   k = value;
-  for (int i = 5; i >= 0; i--)
+  for (int i = 4; i >= 0; i--)
     {
       oct_buf[i] = translate (k & OCTMASK);
       k = k >> 3;
     }
   k = value;
-  sprintf (dec_buf, "%d", value);
   for (int i = 3; i >= 0; i--)
     {
       hex_buf[i] = translate (k & HEXMASK);
@@ -59,4 +59,5 @@ printDecodedCommand (int value)
   mt_gotoXY (str, col);
   write (1, bin, 5);
   write (1, bin_buf, 15);
+  write (1, " ", 1);
 }

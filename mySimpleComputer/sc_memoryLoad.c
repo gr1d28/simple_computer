@@ -7,11 +7,8 @@ sc_memoryLoad (char *filename)
 {
   FILE *fp = NULL;
   int buf[SIZE];
-  if ((fp = fopen (filename, "wb")) == NULL)
-    {
-      fclose (fp);
-      return -1;
-    }
+  if ((fp = fopen (filename, "rb")) == NULL)
+    return -1;
 
   if (fread (buf, sizeof (int), SIZE, fp) != SIZE)
     {

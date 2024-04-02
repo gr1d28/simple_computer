@@ -15,14 +15,19 @@ printCell (int address, color fg, color bg)
   else
     {
       k = address % str_size;
-      if (k >= 1)
-        k++;
       mt_setbgcolor (bg);
       mt_setfgcolor (fg);
       mt_gotoXY ((address / str_size) + 2,
                  ((address % str_size) * size) + k + 2);
       sc_memoryGet (address, &value);
-      write (1, "+", 1);
+      if (value >> 14)
+        {
+          value = value & 0x3FFF;
+          write (1, "-", 1);
+        }
+      else
+        write (1, "+", 1);
+
       for (int i = 0; i < 4; i++)
         {
           int k = (value >> (12 - (i * 4))) & 0xF;
