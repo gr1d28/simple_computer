@@ -161,7 +161,16 @@ main (int argc, char *argv[])
               "Введите значение для аккумулятора формата \"+2F4C\" <= 0x3FFF",
               97);
           mt_gotoXY (2, 69);
-          rk_readvalue (&value, 100);
+          if (rk_readvalue (&value, 100) != 0)
+            {
+              sc_regSet (1, 1);
+              printFlags ();
+            }
+          else
+            {
+              sc_regSet (1, 0);
+              printFlags ();
+            }
           sc_accumulatorSet (value);
           printAccumulator ();
           mt_gotoXY (25, 1);
@@ -175,7 +184,22 @@ main (int argc, char *argv[])
                  "0x3FFF",
                  102);
           mt_gotoXY (5, 79);
-          rk_readvalue (&value, 100);
+          if (rk_readvalue (&value, 100) != 0)
+            {
+              sc_regSet (1, 1);
+              printFlags ();
+            }
+          else if (value < 0 || value > 127)
+            {
+              sc_regSet (3, 1);
+              printFlags ();
+            }
+          else
+            {
+              sc_regSet (1, 0);
+              sc_regSet (3, 0);
+              printFlags ();
+            }
           sc_icounterSet (value);
           printCounters ();
           printCommand ();
@@ -205,6 +229,12 @@ main (int argc, char *argv[])
           printCounters ();
           printCommand ();
           printBigCell (numbers, size, value, address);
+          sc_regGet (3, &value);
+          if (value)
+            {
+              sc_regSet (3, 0);
+              printFlags ();
+            }
           break;
 
         case 9:
@@ -227,6 +257,12 @@ main (int argc, char *argv[])
           printCounters ();
           printCommand ();
           printBigCell (numbers, size, value, address);
+          sc_regGet (3, &value);
+          if (value)
+            {
+              sc_regSet (3, 0);
+              printFlags ();
+            }
           break;
 
         case 10:
@@ -244,6 +280,12 @@ main (int argc, char *argv[])
           printCounters ();
           printCommand ();
           printBigCell (numbers, size, value, address);
+          sc_regGet (3, &value);
+          if (value)
+            {
+              sc_regSet (3, 0);
+              printFlags ();
+            }
           break;
 
         case 11:
@@ -261,6 +303,12 @@ main (int argc, char *argv[])
           printCounters ();
           printCommand ();
           printBigCell (numbers, size, value, address);
+          sc_regGet (3, &value);
+          if (value)
+            {
+              sc_regSet (3, 0);
+              printFlags ();
+            }
           break;
 
         case 14:
@@ -268,7 +316,16 @@ main (int argc, char *argv[])
           write (1, "Введите значение формата \"+2F4C\" <= 0x3FFF", 65);
           mt_gotoXY (address / 10 + 2,
                      (address % 10) * 5 + (address % 10) + 2);
-          rk_readvalue (&value, 100);
+          if (rk_readvalue (&value, 100) != 0)
+            {
+              sc_regSet (1, 1);
+              printFlags ();
+            }
+          else
+            {
+              sc_regSet (1, 0);
+              printFlags ();
+            }
           mt_gotoXY (25, 1);
           mt_delline ();
           sc_memorySet (address, value);
