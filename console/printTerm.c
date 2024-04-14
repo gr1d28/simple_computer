@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#define MASK 0xF
+#define MASK3 0x7
+#define MASK4 0xF
 char translate (int value);
 void
 printTerm (int address, int input)
@@ -20,17 +21,27 @@ printTerm (int address, int input)
   strncpy (second, first, 9);
   strncpy (first, this, 9);
   value = address;
-  this[1] = translate (value & MASK);
+  this[1] = translate (value & MASK4);
   value = value >> 4;
-  this[0] = translate (value & MASK);
+  this[0] = translate (value & MASK4);
 
   sc_memoryGet (address, &value);
   this[4] = (value >> 14) ? '-' : '+';
   value = value & 0x3FFF;
   for (int i = 8; i >= 5; i--)
     {
-      this[i] = translate (value & MASK);
-      value = value >> 4;
+      if (i % 2 == 0)
+        {
+          this[i] = translate (value & MASK4);
+          value = value >> 4;
+        }
+      else
+        {
+          this[i] = translate (value & MASK3);
+          value = value >> 3;
+        }
+      // this[i] = translate (value & MASK);
+      // value = value >> 4;
     }
   if (input == 0)
     this[2] = '>';

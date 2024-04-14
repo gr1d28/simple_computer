@@ -22,3 +22,9 @@ int font ();
 void printBigCell (int *big, int size, int value, int number);
 
 void printKeys (void);
+
+void CU (void);
+
+void IRC (int signo);
+
+int ALU (int command, int operand);

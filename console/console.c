@@ -1,9 +1,27 @@
 #include "console.h"
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <unistd.h>
 extern int SIZE;
+int address;
+int last_address;
+
+void
+signalhandlerusr (int signo)
+{
+  sc_accumulatorInit ();
+  sc_icounterInit ();
+  sc_memoryInit ();
+  sc_regInit ();
+  for (int i = 0; i < SIZE; i++)
+    {
+      sc_memorySet (i, 0);
+      printCell (i, 1, 0);
+    }
+}
 
 int
 main (int argc, char *argv[])
@@ -14,8 +32,11 @@ main (int argc, char *argv[])
   char file_name[20];
   int numbers[size];
   int check_numbers = 0;
+  address = 0;
+  last_address = 0;
   color fg = 1, bg = 0;
   keys key = -1;
+  struct itimerval ival, oval;
   mt_clrscr ();
   if (!isatty (1))
     {
@@ -75,30 +96,50 @@ main (int argc, char *argv[])
   printTerm (0, 0);
   printBigCell (numbers, size, value, 0);
 
+  ival.it_interval.tv_sec = 0;
+  ival.it_interval.tv_usec = 500000;
+  ival.it_value.tv_sec = 0;
+  ival.it_value.tv_usec = 500000;
+
+  signal (SIGALRM, IRC);
+  signal (SIGUSR1, signalhandlerusr);
+
+  setitimer (ITIMER_REAL, &ival, &oval);
+
   rk_mytermsave ();
   rk_mytermregime (1, 0, 0, 1, 0);
 
-  int address = 0, last_address = 0;
   while (key != ESC)
     {
       rk_readkey (&key);
+      sc_regGet (4, &value);
+      if (value == 0)
+        {
+          if (key == 4)
+            {
+              sc_regSet (4, 1);
+              printFlags ();
+              last_address = address;
+            }
+          continue;
+        }
       switch (key)
         {
         case 0:
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           write (1, "Введите имя файла для загрузки: ", 59);
           rk_mytermrestore ();
           read (1, file_name, 20);
           if (sc_memoryLoad (file_name) == -1)
             {
-              mt_gotoXY (25, 1);
+              mt_gotoXY (26, 1);
               mt_delline ();
               write (1, "Ошибка загрузки файла", 41);
             }
           else
             {
-              mt_gotoXY (25, 1);
+              mt_gotoXY (26, 1);
               mt_delline ();
             }
           for (int i = 0; i < SIZE; i++)
@@ -113,20 +154,20 @@ main (int argc, char *argv[])
           break;
 
         case 1:
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           write (1, "Введите имя файла для сохранения: ", 63);
           rk_mytermrestore ();
           read (1, file_name, 20);
           if (sc_memorySave (file_name) == -1)
             {
-              mt_gotoXY (25, 1);
+              mt_gotoXY (26, 1);
               mt_delline ();
               write (1, "Ошибка записи в файл", 38);
             }
           else
             {
-              mt_gotoXY (25, 1);
+              mt_gotoXY (26, 1);
               mt_delline ();
             }
           printCell (address, 0, 7);
@@ -134,15 +175,7 @@ main (int argc, char *argv[])
           break;
 
         case 2:
-          sc_accumulatorInit ();
-          sc_icounterInit ();
-          sc_memoryInit ();
-          sc_regInit ();
-          for (int i = 0; i < SIZE; i++)
-            {
-              sc_memorySet (i, 0);
-              printCell (i, fg, bg);
-            }
+          raise (SIGUSR1);
           printCell (address, 0, 7);
           printAccumulator ();
           printFlags ();
@@ -154,8 +187,41 @@ main (int argc, char *argv[])
           printBigCell (numbers, size, value, address);
           break;
 
+        case 3:
+          sc_regGet (4, &value);
+
+          if (value)
+            {
+              sc_regSet (4, 0);
+              sc_regSet (5, 0);
+              printFlags ();
+              mt_gotoXY (19, 65);
+              write (1, "         ", 9);
+              mt_gotoXY (19, 65);
+              pause ();
+              // mt_gotoXY(address / 10 + 2,
+              //          (address % 10) * 5 + (address % 10) + 2);
+              // raise(SIGALRM);
+              printCell (last_address, fg, bg);
+              printCell (address, 0, 7);
+              last_address = address;
+              sc_memoryGet (address, &value);
+              printBigCell (numbers, size, value, address);
+            }
+          else
+            {
+              alarm (0);
+              sc_regSet (4, 1);
+              printFlags ();
+            }
+          break;
+
+          // case 4:
+          //   raise(SIGALRM);
+          //   break;
+
         case 6:
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           write (
               1,
               "Введите значение для аккумулятора формата \"+2F4C\" <= 0x3FFF",
@@ -165,6 +231,7 @@ main (int argc, char *argv[])
             {
               sc_regSet (1, 1);
               printFlags ();
+              break;
             }
           else
             {
@@ -173,12 +240,12 @@ main (int argc, char *argv[])
             }
           sc_accumulatorSet (value);
           printAccumulator ();
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           break;
 
         case 7:
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           write (1,
                  "Введите значение для счётчика команд формата \"+2F4C\" <= "
                  "0x3FFF",
@@ -188,11 +255,14 @@ main (int argc, char *argv[])
             {
               sc_regSet (1, 1);
               printFlags ();
+              break;
             }
           else if (value < 0 || value > 127)
             {
               sc_regSet (3, 1);
               printFlags ();
+              value = 0;
+              break;
             }
           else
             {
@@ -200,12 +270,17 @@ main (int argc, char *argv[])
               sc_regSet (3, 0);
               printFlags ();
             }
+          last_address = address;
+          address = value;
           sc_icounterSet (value);
           printCounters ();
           printCommand ();
-          sc_memoryGet (value, &value);
+          sc_memoryGet (address, &value);
+          printCell (address, 0, 7);
+          printCell (last_address, fg, bg);
+          printBigCell (numbers, size, value, address);
           printDecodedCommand (value);
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           break;
 
@@ -312,7 +387,7 @@ main (int argc, char *argv[])
           break;
 
         case 14:
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           write (1, "Введите значение формата \"+2F4C\" <= 0x3FFF", 65);
           mt_gotoXY (address / 10 + 2,
                      (address % 10) * 5 + (address % 10) + 2);
@@ -320,13 +395,15 @@ main (int argc, char *argv[])
             {
               sc_regSet (1, 1);
               printFlags ();
+              printCell (address, 0, 7);
+              break;
             }
           else
             {
               sc_regSet (1, 0);
               printFlags ();
             }
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           sc_memorySet (address, value);
           printCell (address, 0, 7);
@@ -336,14 +413,14 @@ main (int argc, char *argv[])
           printCounters ();
           printCommand ();
           printBigCell (numbers, size, value, address);
-          mt_gotoXY (25, 1);
+          mt_gotoXY (26, 1);
           mt_delline ();
           break;
         }
     }
 
   rk_mytermrestore ();
+  mt_gotoXY (26, 1);
   mt_delline ();
-
   return 0;
 }

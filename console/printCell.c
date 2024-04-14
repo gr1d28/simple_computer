@@ -8,7 +8,7 @@ char translate (int value);
 void
 printCell (int address, color fg, color bg)
 {
-  int size = 5, value = 0, str_size = 10, k;
+  int size = 5, value = 0, str_size = 10, k, shift = 11;
   char buf[4];
   if (address < 0 || address >= 128)
     printf ("Выход за границы\n");
@@ -30,8 +30,19 @@ printCell (int address, color fg, color bg)
 
       for (int i = 0; i < 4; i++)
         {
-          int k = (value >> (12 - (i * 4))) & 0xF;
+          if (i % 2 == 0)
+            {
+              k = (value >> shift) & 0x7;
+              shift -= 4;
+            }
+          else
+            {
+              k = (value >> shift) & 0xF;
+              shift -= 3;
+            }
           buf[i] = translate (k);
+          // int c = (value >> (12 - (i * 4))) & 0xF;
+          // buf[i] = translate (c);
         }
       write (1, buf, 4);
       mt_setdefaultcolor ();

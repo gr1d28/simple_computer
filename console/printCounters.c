@@ -3,7 +3,8 @@
 #include "SC.h"
 #include <stdio.h>
 #include <unistd.h>
-#define MASK 0xF
+#define MASK3 0x7
+#define MASK4 0xF
 
 char translate (int value);
 
@@ -23,8 +24,18 @@ printCounters (void)
 
   for (int i = 4; i >= 1; i--)
     {
-      ic_buf[i] = translate (count & MASK);
-      count = count >> 4;
+      if (i % 2 == 0)
+        {
+          ic_buf[i] = translate (count & MASK4);
+          count = count >> 4;
+        }
+      else
+        {
+          ic_buf[i] = translate (count & MASK3);
+          count = count >> 3;
+        }
+      // ic_buf[i] = translate (count & MASK);
+      // count = count >> 4;
     }
   T_buf[0] = '0';
   T_buf[1] = '0';

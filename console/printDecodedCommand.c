@@ -17,11 +17,17 @@ printDecodedCommand (int value)
   char hex[5] = { 'h', 'e', 'x', ':', ' ' };
   char bin_buf[15];
   char oct_buf[5];
-  char dec_buf[5] = { '0', '0', '0', '0', '0' };
+  char dec_buf[5] = { ' ', ' ', ' ', ' ', ' ' };
   char hex_buf[4];
-  int k = value;
+  int k;
   int str = 19, col = 3;
-  sprintf (dec_buf, "%d", value);
+  mt_gotoXY (str, col);
+  write (1, dec, 5);
+  write (1, dec_buf, 5);
+  if (value >> 14)
+    value = (~(value & 0x3FFF) | 0x4000 + 1) & 0x7FFF;
+  k = value;
+  sprintf (dec_buf, "%d", k);
   for (int i = 14; i >= 0; i--)
     {
       if (k & BINMASK)

@@ -83,7 +83,7 @@ int
 rk_readvalue (int *value, int timeout)
 {
   keys k = 0;
-  int v = 0;
+  int v = 0, shift = 11;
   struct termios tc_saved;
   if (tcgetattr (1, &tc_saved) != 0)
     return -1;
@@ -105,19 +105,42 @@ rk_readvalue (int *value, int timeout)
       tcsetattr (1, TCSANOW, &tc_saved);
       return -1;
     }
-
-  for (int i = 3; i >= 0; i--)
+  // 0 000 0000 000 0000
+  for (int i = 3; i >= 0; i--) // << 11; << 7; << 4; << 0;
     {
       rk_readkey (&k);
-      int tmp = -1;
+      int tmp = 0;
       char c = ' ';
-      if ((tmp = transl (k, &c)) == -1 || (i == 3 && tmp > 3))
+      if ((tmp = transl (k, &c)) == -1)
         {
           tcsetattr (1, TCSANOW, &tc_saved);
           return -1;
         }
-      write (1, &c, 1);
-      v = v | (tmp << i * 4);
+
+      if (i % 2 != 0)
+        {
+          if (tmp > 0x7)
+            {
+              tcsetattr (1, TCSANOW, &tc_saved);
+              return -1;
+            }
+          write (1, &c, 1);
+          v = v | (tmp << shift);
+          shift -= 4;
+        }
+      else
+        {
+          write (1, &c, 1);
+          v = v | (tmp << shift);
+          shift -= 3;
+        }
+      // if ((tmp = transl (k, &c)) == -1 || (i == 3 && tmp > 3))
+      //   {
+      //     tcsetattr (1, TCSANOW, &tc_saved);
+      //     return -1;
+      //   }
+      // write (1, &c, 1);
+      // v = v | (tmp << i * 4);
     }
   tcsetattr (1, TCSANOW, &tc_saved);
   if (v > 0x7FFF)
