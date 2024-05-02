@@ -11,7 +11,7 @@ printBigCell (int *big, int size, int value, int number)
 {
   int str = 8, col = 65, k = 0, m = 10, shift = 11;
   char buf[4];
-  bc_box (str - 1, col - 2, 9, 46, 7, 9, "Editable memory cell", 1, 7);
+  bc_box (str - 1, col - 2, 10, 46, 7, 9, "Editable memory cell", 1, 7);
   if (value >> 14)
     {
       bc_printbigchar (&big[17 * 2], str, col, 9, 7);
@@ -34,8 +34,6 @@ printBigCell (int *big, int size, int value, int number)
         }
       col += 9;
       bc_printbigchar (&big[k * 2], str, col, 9, 7);
-      // k = (value >> i * 4) & MASK;
-      // bc_printbigchar (&big[k * 2], str, col, 9, 7);
     }
   k = 0;
   sprintf (buf, "%d", number);

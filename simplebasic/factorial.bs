@@ -1,0 +1,16 @@
+10  INPUT  N
+20 REM Ввод N
+30 IF N < 0 END
+40 REM Если N отрицательное, то выход из программы
+50 IF N > 1 GOTO 100
+60 REM Если N == 0 или == 1 , то вывод 1 и завершение
+70 LET A = 1
+80 OUTPUT A
+90 END
+100 LET A = N
+110 LET B = 1
+120 LET N = N - B
+130 LET A = A * N
+140 IF N != 1 GOTO 120
+150 OUTPUT A
+160 END

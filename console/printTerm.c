@@ -10,13 +10,15 @@ char translate (int value);
 void
 printTerm (int address, int input)
 {
-  int value = 0, str = 19, col = 65;
+  int value = 0, str = 20, col = 69;
   static int c = 1;
   static char this[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
   static char first[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
   static char second[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
   static char third[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
+  static char fourth[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
+  strncpy (fourth, third, 9);
   strncpy (third, second, 9);
   strncpy (second, first, 9);
   strncpy (first, this, 9);
@@ -40,14 +42,12 @@ printTerm (int address, int input)
           this[i] = translate (value & MASK3);
           value = value >> 3;
         }
-      // this[i] = translate (value & MASK);
-      // value = value >> 4;
     }
   if (input == 0)
     this[2] = '>';
   else
     this[2] = '<';
-  bc_box (str - 1, col - 1, 4, 9, 7, 9, "IN--OUT", 2, 7);
+  bc_box (str - 1, col - 1, 5, 9, 7, 9, "IN--OUT", 2, 7);
   mt_gotoXY (str, col);
   write (1, this, 10);
   str++;
@@ -59,4 +59,7 @@ printTerm (int address, int input)
   str++;
   mt_gotoXY (str, col);
   write (1, third, 10);
+  str++;
+  mt_gotoXY (str, col);
+  write (1, fourth, 10);
 }

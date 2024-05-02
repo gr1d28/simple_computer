@@ -20,14 +20,16 @@ printDecodedCommand (int value)
   char dec_buf[5] = { ' ', ' ', ' ', ' ', ' ' };
   char hex_buf[4];
   int k;
-  int str = 19, col = 3;
+  int str = 17, col = 3;
   mt_gotoXY (str, col);
   write (1, dec, 5);
   write (1, dec_buf, 5);
   if (value >> 14)
-    value = (~(value & 0x3FFF) | 0x4000 + 1) & 0x7FFF;
-  k = value;
+    k = (value & 0x3FFF) * (-1);
+  else
+    k = value;
   sprintf (dec_buf, "%d", k);
+  k = value;
   for (int i = 14; i >= 0; i--)
     {
       if (k & BINMASK)

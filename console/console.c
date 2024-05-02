@@ -8,6 +8,8 @@
 extern int SIZE;
 int address;
 int last_address;
+int numbers[36];
+int size_of_numbers = 36;
 
 void
 signalhandlerusr (int signo)
@@ -16,6 +18,8 @@ signalhandlerusr (int signo)
   sc_icounterInit ();
   sc_memoryInit ();
   sc_regInit ();
+  sc_timerInit ();
+  sc_cacheInit ();
   for (int i = 0; i < SIZE; i++)
     {
       sc_memorySet (i, 0);
@@ -23,14 +27,22 @@ signalhandlerusr (int signo)
     }
 }
 
+void
+fix_filename (char *file_name)
+{
+  int i = 0;
+  while (file_name[i] != '\n')
+    i++;
+  file_name[i] = '\0';
+}
+
 int
 main (int argc, char *argv[])
 {
   int rows, cols, value;
-  int size = 18 * 2, fd;
+  int fd;
   char *font_file_name = "font.bin";
-  char file_name[20];
-  int numbers[size];
+  char file_name[50];
   int check_numbers = 0;
   address = 0;
   last_address = 0;
@@ -79,6 +91,8 @@ main (int argc, char *argv[])
   sc_icounterInit ();
   sc_memoryInit ();
   sc_regInit ();
+  sc_timerInit ();
+  sc_cacheInit ();
   for (int i = 0; i < SIZE; i++)
     {
       sc_memorySet (i, 0);
@@ -94,7 +108,9 @@ main (int argc, char *argv[])
   sc_memoryGet (0, &value);
   printDecodedCommand (value);
   printTerm (0, 0);
-  printBigCell (numbers, size, value, 0);
+  printBigCell (numbers, size_of_numbers, value, 0);
+  printTimer ();
+  printCache ();
 
   ival.it_interval.tv_sec = 0;
   ival.it_interval.tv_usec = 500000;
@@ -109,20 +125,48 @@ main (int argc, char *argv[])
   rk_mytermsave ();
   rk_mytermregime (1, 0, 0, 1, 0);
 
+  int step = 0;
   while (key != ESC)
     {
       rk_readkey (&key);
-      sc_regGet (4, &value);
-      if (value == 0)
+      // sc_regGet (4, &value);
+      if (key == 4)
         {
-          if (key == 4)
+          sc_regSet (4, 0);
+          printFlags ();
+          pause ();
+          sc_timerGet (&value);
+          while (value > 1)
             {
-              sc_regSet (4, 1);
-              printFlags ();
-              last_address = address;
+              pause ();
+              sc_timerGet (&value);
             }
+          if (value == 1)
+            {
+              pause ();
+              pause ();
+            }
+          sc_timerGet (&value);
+          while (value > 1)
+            {
+              pause ();
+              sc_timerGet (&value);
+            }
+          if (value == 1)
+            {
+              pause ();
+              pause ();
+            }
+          sc_regSet (4, 1);
+          printFlags ();
+          last_address = address;
+          sc_memoryGet (address, &value);
+          printBigCell (numbers, size_of_numbers, value, address);
           continue;
         }
+      sc_regGet (4, &value);
+      if (value == 0)
+        continue;
       switch (key)
         {
         case 0:
@@ -130,7 +174,8 @@ main (int argc, char *argv[])
           mt_delline ();
           write (1, "Введите имя файла для загрузки: ", 59);
           rk_mytermrestore ();
-          read (1, file_name, 20);
+          read (1, file_name, 50);
+          fix_filename (file_name);
           if (sc_memoryLoad (file_name) == -1)
             {
               mt_gotoXY (26, 1);
@@ -142,6 +187,7 @@ main (int argc, char *argv[])
               mt_gotoXY (26, 1);
               mt_delline ();
             }
+          sc_cacheInit ();
           for (int i = 0; i < SIZE; i++)
             printCell (i, fg, bg);
           printCell (address, 0, 7);
@@ -150,6 +196,7 @@ main (int argc, char *argv[])
           sc_icounterGet (&value);
           sc_memoryGet (value, &value);
           printDecodedCommand (value);
+          printCache ();
           rk_mytermregime (1, 0, 0, 1, 0);
           break;
 
@@ -158,7 +205,8 @@ main (int argc, char *argv[])
           mt_delline ();
           write (1, "Введите имя файла для сохранения: ", 63);
           rk_mytermrestore ();
-          read (1, file_name, 20);
+          read (1, file_name, 50);
+          fix_filename (file_name);
           if (sc_memorySave (file_name) == -1)
             {
               mt_gotoXY (26, 1);
@@ -183,8 +231,10 @@ main (int argc, char *argv[])
           printCommand ();
           sc_memoryGet (address, &value);
           printDecodedCommand (value);
-          printTerm (address, 0);
-          printBigCell (numbers, size, value, address);
+          // printTerm (address, 0);
+          printBigCell (numbers, size_of_numbers, value, address);
+          printTimer ();
+          printCache ();
           break;
 
         case 3:
@@ -195,18 +245,12 @@ main (int argc, char *argv[])
               sc_regSet (4, 0);
               sc_regSet (5, 0);
               printFlags ();
-              mt_gotoXY (19, 65);
-              write (1, "         ", 9);
-              mt_gotoXY (19, 65);
               pause ();
-              // mt_gotoXY(address / 10 + 2,
-              //          (address % 10) * 5 + (address % 10) + 2);
-              // raise(SIGALRM);
               printCell (last_address, fg, bg);
               printCell (address, 0, 7);
               last_address = address;
               sc_memoryGet (address, &value);
-              printBigCell (numbers, size, value, address);
+              printBigCell (numbers, size_of_numbers, value, address);
             }
           else
             {
@@ -215,11 +259,6 @@ main (int argc, char *argv[])
               printFlags ();
             }
           break;
-
-          // case 4:
-          //   raise(SIGALRM);
-          //   break;
-
         case 6:
           mt_gotoXY (26, 1);
           write (
@@ -278,7 +317,7 @@ main (int argc, char *argv[])
           sc_memoryGet (address, &value);
           printCell (address, 0, 7);
           printCell (last_address, fg, bg);
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           printDecodedCommand (value);
           mt_gotoXY (26, 1);
           mt_delline ();
@@ -299,11 +338,10 @@ main (int argc, char *argv[])
           printCell (address, 0, 7);
           sc_memoryGet (address, &value);
           printDecodedCommand (value);
-          printTerm (address, 0);
           sc_icounterSet (address);
           printCounters ();
           printCommand ();
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           sc_regGet (3, &value);
           if (value)
             {
@@ -327,11 +365,10 @@ main (int argc, char *argv[])
           printCell (address, 0, 7);
           sc_memoryGet (address, &value);
           printDecodedCommand (value);
-          printTerm (address, 0);
           sc_icounterSet (address);
           printCounters ();
           printCommand ();
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           sc_regGet (3, &value);
           if (value)
             {
@@ -350,11 +387,10 @@ main (int argc, char *argv[])
           printCell (address, 0, 7);
           sc_memoryGet (address, &value);
           printDecodedCommand (value);
-          printTerm (address, 0);
           sc_icounterSet (address);
           printCounters ();
           printCommand ();
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           sc_regGet (3, &value);
           if (value)
             {
@@ -373,11 +409,10 @@ main (int argc, char *argv[])
           printCell (address, 0, 7);
           sc_memoryGet (address, &value);
           printDecodedCommand (value);
-          printTerm (address, 0);
           sc_icounterSet (address);
           printCounters ();
           printCommand ();
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           sc_regGet (3, &value);
           if (value)
             {
@@ -406,13 +441,29 @@ main (int argc, char *argv[])
           mt_gotoXY (26, 1);
           mt_delline ();
           sc_memorySet (address, value);
+          if (sc_cacheValidate (address / 10) != 0)
+            {
+              int t = 10;
+              sc_timerSet (t);
+              printTimer ();
+              while (t > 0)
+                {
+                  pause ();
+                  sc_timerTick ();
+                  printTimer ();
+                  sc_timerGet (&t);
+                }
+              sc_cacheLoad (address / 10);
+            }
+          else
+            sc_cacheSet (address, value);
+          printCache ();
           printCell (address, 0, 7);
           printDecodedCommand (value);
-          printTerm (address, 1);
           sc_icounterSet (address);
           printCounters ();
           printCommand ();
-          printBigCell (numbers, size, value, address);
+          printBigCell (numbers, size_of_numbers, value, address);
           mt_gotoXY (26, 1);
           mt_delline ();
           break;

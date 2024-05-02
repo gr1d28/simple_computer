@@ -12,6 +12,8 @@ PROG_NAME = con
 $(CON)/$(PROG_NAME): $(CON)/*.o $(DIR)/$(LIB_NAME_SC) $(MT)/$(LIB_NAME_MT) $(MBC)/$(LIB_NAME_MBC) $(MK)/$(LIB_NAME_MK)
 	gcc -Wall -I$(DIR)/ -I$(MT)/ -I$(MBC) -I$(MK) $(CON)/*.o $(DIR)/$(LIB_NAME_SC) $(MT)/$(LIB_NAME_MT) $(MBC)/$(LIB_NAME_MBC) $(MK)/$(LIB_NAME_MK) -o $(PROG_NAME) -g
 	mv $(PROG_NAME) $(CON)/$(PROG_NAME)
+	cd simpleassembler &&  $(MAKE) all
+	cd simplebasic && $(MAKE) all
 
 $(MK)/$(LIB_NAME_MK): $(MK)/*.o
 	ar rcs $(LIB_NAME_MK) $(MK)/*.o

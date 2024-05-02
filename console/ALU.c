@@ -7,13 +7,11 @@ ALU (int command, int operand)
 {
   int a = 0, b = 0, res = 0;
   sc_accumulatorGet (&a);
-  sc_memoryGet (operand, &b);
-  printTerm (operand, 0);
+  sc_cacheGet (operand, &b, 0);
 
   if (a >> 14)
     {
       a = (a & 0x3FFF) * (-1);
-      // a = ((~(a) & 0x3FFF) + 1) & 0x3FFF;
     }
   if (b >> 14)
     {

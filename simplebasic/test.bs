@@ -1,0 +1,7 @@
+10   REM  Какая-то фигня
+20   INPUT  A
+30    OUTPUT   A
+40   LET B = A - 2
+50   IF  B < 0  GOTO 20
+60    OUTPUT   B
+70    END

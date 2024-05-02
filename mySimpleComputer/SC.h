@@ -31,3 +31,23 @@ int sc_regGet (int registers, int *value);
 int sc_regInit (void);
 
 int sc_regSet (int registers, int value);
+
+int sc_timerInit (void);
+
+int sc_timerGet (int *value);
+
+int sc_timerSet (int value);
+
+int sc_timerTick (void);
+
+int sc_cacheInit (void);
+
+int sc_cacheGet (int address, int *value, int print);
+
+int sc_cacheSet (int address, int value);
+
+int sc_cacheLoad (int str_num);
+
+int sc_cacheStore (int str_num);
+
+int sc_cacheValidate (int str_num);
