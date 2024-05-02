@@ -1,6 +1,8 @@
 extern int CACHE[][12];
 
-int sc_cacheValidate (int str_num) //проверка присутствия строки в кэше
+//проверка присутствия строки в кэше
+int
+sc_cacheValidate (int str_num)
 {
   for (int i = 0; i < 5; i++)
     {

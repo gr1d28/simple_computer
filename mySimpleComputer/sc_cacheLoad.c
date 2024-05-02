@@ -2,7 +2,9 @@ extern int CACHE[][12];
 extern int RAM[];
 extern int SIZE;
 
-int sc_cacheLoad (int str_num) //загружает строку из RAM в кэш
+//загружает строку из RAM в кэш
+int
+sc_cacheLoad (int str_num)
 {
   if ((str_num * 10) > SIZE)
     return -1;

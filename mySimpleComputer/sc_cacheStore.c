@@ -2,8 +2,9 @@ extern int CACHE[][12];
 extern int RAM[];
 extern int SIZE;
 
-int sc_cacheStore (
-    int str_num) //выгружает строку из кэша в RAM (строка остается в кэше)
+//выгружает строку из кэша в RAM (строка остается в кэше)
+int
+sc_cacheStore (int str_num)
 {
   if ((str_num * 10) > SIZE)
     return -1;

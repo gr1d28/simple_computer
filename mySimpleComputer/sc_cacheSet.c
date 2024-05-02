@@ -1,8 +1,9 @@
 extern int CACHE[][12];
 extern int SIZE;
 
-int sc_cacheSet (int address,
-                 int value) //устанавливает значение в кэше по адресу в value
+//устанавливает значение в кэше по адресу в value
+int
+sc_cacheSet (int address, int value)
 {
   if (address < 0 || address >= SIZE)
     return -1;
