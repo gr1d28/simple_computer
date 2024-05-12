@@ -30,17 +30,17 @@ ALU (int command, int operand)
       break;
 
     case 0x20:
-      if(b != 0)
-      {
-        res = a / b;
-        sc_regSet(2, 0);
-      }
+      if (b != 0)
+        {
+          res = a / b;
+          sc_regSet (2, 0);
+        }
       else
-      {
-        sc_regSet(2, 1);
-        sc_regSet(4, 1);
-        return 0;
-      }
+        {
+          sc_regSet (2, 1);
+          sc_regSet (4, 1);
+          return 0;
+        }
       break;
 
     case 0x21:
