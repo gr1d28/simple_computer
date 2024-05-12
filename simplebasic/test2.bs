@@ -1,0 +1,3 @@
+10 LET B = - 2 + 3 4
+20 OUTPUT B
+30 END

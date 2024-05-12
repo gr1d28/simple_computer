@@ -331,7 +331,247 @@ goto_func (ofstream *fout, map<int, int> *address_str, stack<int> *addr_stack,
   (*fout) << address << "  " << command << "  " << endl;
   return 0;
 }
-//добавить проверку this_address < variable_count
+
+int
+check_notation (string str, int start)
+{
+  int i = start;
+  int last_op = 0; // 1 - знак, 2 - операнд
+  while (str[i] == ' ')
+    i++;
+  if (str[i] == '+' || str[i] == '*' || str[i] == '/')
+    return 2;
+  while (str[i] != '\0')
+    {
+      while (str[i] == ' ')
+        i++;
+      if (str[i] == '(')
+        return 1;
+      if ((str[i] == '+' || str[i] == '*' || str[i] == '/' || str[i] == '-'))
+        {
+          if (last_op == 1)
+            return 2;
+          last_op = 1;
+          i++;
+        }
+      else
+        {
+          if (last_op == 2)
+            return 2;
+          last_op = 2;
+          while (str[i] != ' ' && str[i] != '\0')
+            i++;
+        }
+    }
+  return 1;
+}
+
+int
+check_next_value (map<char, int> *variable_list, string str, int *var,
+                  char *revar, int *start)
+{
+  int i = *start, count = 0;
+  string sub = "";
+  if (str[i] == 'A')
+    {
+      *var = 3;
+      *start = (*start) + 1;
+      return 0;
+    }
+  else if (str[i] >= 65 && str[i] <= 90)
+    {
+      if (variable_list->count (str[i]))
+        {
+          *var = 1;
+          *start = (*start) + 1;
+          *revar = str[i];
+          return 0;
+        }
+      return -1;
+    }
+  else
+    {
+      while (str[i] >= 48 && str[i] <= 57)
+        {
+          sub = sub + str[i];
+          count++;
+          i++;
+        }
+      if (count == 0)
+        return -1;
+      *var = 2;
+      *start = (*start) + count;
+      return atoi (sub.c_str ());
+    }
+  return -1;
+}
+
+int
+polish_notation (ofstream *fout, map<char, int> *variable_list, string str,
+                 int str_num, int start, int *this_address,
+                 int *variable_count)
+{
+  int i = start, beginning = 0;
+  int left = 0, right = 0, lvalue = 0, rvalue = 0, acc = 0,
+      res_addr = (*variable_count), temp = 0;
+  char varl = '\0', varr = '\0', oper = '\0';
+  string address = "", command = "", operand = "", sub1 = "", sub2 = "";
+  stack<int> varib;
+  str = str.substr (i, str.length () - i);
+  i = 0;
+  while (1)
+    {
+      while (str[i] == ' ')
+        i++;
+      beginning = i;
+      if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+        {
+          oper = str[i];
+          i++;
+        }
+      else
+        {
+          cout << "Ошибка в строке " << str_num / 10 << endl;
+          cout << "Нарушен синтаксис команды LET" << endl;
+          return -1;
+        }
+      while (str[i] == ' ')
+        i++;
+      if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+        continue;
+      if ((lvalue = check_next_value (variable_list, str, &left, &varl, &i))
+          == -1)
+        {
+          cout << "Ошибка в строке " << str_num / 10 << endl;
+          cout << "Нарушен синтаксис команды LET" << endl;
+          return -1;
+        }
+      while (str[i] == ' ')
+        i++;
+      if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+        continue;
+      if ((rvalue = check_next_value (variable_list, str, &right, &varr, &i))
+          == -1)
+        {
+          cout << "Ошибка в строке " << str_num / 10 << endl;
+          cout << "Нарушен синтаксис команды LET" << endl;
+          return -1;
+        }
+
+      if (((right == 3 && (oper == '-' || oper == '/'))
+           || (left != 3 && right != 3) || (left == 3 && right == 3))
+          && acc == 1)
+        {
+          address = to_string ((*this_address));
+          *this_address = (*this_address) + 1;
+          command = "  STORE  ";
+          if (((*variable_count) + 1) < res_addr)
+            operand = to_string (res_addr);
+          else
+            {
+              operand = to_string ((*variable_count));
+              *variable_count = (*variable_count) - 1;
+            }
+          (*fout) << address << command << operand << endl;
+          varib.push (res_addr);
+          res_addr--;
+          acc = 0;
+        }
+      if (left == 3 && right == 3)
+        {
+          temp = varib.top ();
+          varib.pop ();
+          address = to_string ((*this_address));
+          *this_address = (*this_address) + 1;
+          command = "  LOAD  ";
+          operand = to_string (varib.top ());
+          varib.pop ();
+          (*fout) << address << command << operand << endl;
+          operand = to_string (temp);
+          res_addr = res_addr + 2;
+        }
+
+      if (left != 3)
+        {
+          if (left == 2) //константа
+            {
+              address = to_string ((*variable_count));
+              *variable_count = (*variable_count) - 1;
+              command = " = ";
+              operand = translate (lvalue);
+              (*fout) << address << command << operand << endl;
+              operand = to_string ((*variable_count) + 1);
+            }
+          else if (left == 1)
+            operand = to_string ((*variable_list)[varl]);
+          if (acc == 0)
+            {
+              address = to_string ((*this_address));
+              *this_address = (*this_address) + 1;
+              command = "  LOAD  ";
+              (*fout) << address << command << operand << endl;
+            }
+        }
+      if (right != 3)
+        {
+          if (right == 2) //константа
+            {
+              address = to_string ((*variable_count));
+              *variable_count = (*variable_count) - 1;
+              command = " = ";
+              operand = translate (rvalue);
+              (*fout) << address << command << operand << endl;
+              operand = to_string ((*variable_count) + 1);
+            }
+          else if (right == 1)
+            operand = to_string ((*variable_list)[varr]);
+        }
+      else if (right == 3 && left != 3 && (oper == '-' || oper == '/'))
+        {
+          operand = to_string (varib.top ());
+          varib.pop ();
+          res_addr++;
+        }
+      left = 0;
+      varl = '\0';
+      right = 0;
+      varr = '\0';
+      if (oper == '+')
+        command = "  ADD  ";
+      else if (oper == '-')
+        command = "  SUB  ";
+      else if (oper == '*')
+        command = "  MUL  ";
+      else
+        command = "  DIVIDE  ";
+      address = to_string ((*this_address));
+      *this_address = (*this_address) + 1;
+      (*fout) << address << command << operand << endl;
+      acc = 1;
+      sub1 = str.substr (0, beginning);
+      sub2 = str.substr (i, str.length () - i);
+      char ch1 = '\0', ch2 = '\0';
+      int j = 0;
+      while (sub1[j] == ' ')
+        j++;
+      ch1 = sub1[j];
+      j = 0;
+      while (sub2[j] == ' ')
+        j++;
+      ch2 = sub2[j];
+      if (ch1 == '\0' && ch2 == '\0')
+        break;
+      str = sub1 + 'A' + sub2;
+      i = 0;
+    }
+  if (acc == 0 || !varib.empty ())
+    {
+      cout << "Ошибка в строке " << str_num / 10 << endl;
+      cout << "Нарушен синтаксис команды LET" << endl;
+      return -1;
+    }
+  return 0;
+}
 int
 definition_coefficient (string str, int start)
 {
@@ -905,25 +1145,35 @@ let_func (ofstream *fout, map<char, int> *variable_list,
       return -1;
     }
   i++;
-  max_coefficient = definition_coefficient (str, i);
-  if (max_coefficient == -1)
+  if (check_notation (str, i) == 1) //арифметика
     {
-      cout << "Ошибка в строке " << str_num / 10 << endl;
-      cout << "Нарушен синтаксис команды LET" << endl;
-      return -1;
+      max_coefficient = definition_coefficient (str, i);
+      if (max_coefficient == -1)
+        {
+          cout << "Ошибка в строке " << str_num / 10 << endl;
+          cout << "Нарушен синтаксис команды LET" << endl;
+          return -1;
+        }
+      min_coeff = min_coefficient (str, i, max_coefficient);
+      if (min_coeff == -1)
+        {
+          cout << "Ошибка в строке " << str_num / 10 << endl;
+          cout << "Нарушен синтаксис команды LET" << endl;
+          return -1;
+        }
+      if ((ans = recursive_counting (fout, variable_list, str, str_num, i,
+                                     this_address, variable_count,
+                                     max_coefficient, min_coeff, &p))
+          == -1)
+        return -1;
     }
-  min_coeff = min_coefficient (str, i, max_coefficient);
-  if (min_coeff == -1)
+  else //польская нотация
     {
-      cout << "Ошибка в строке " << str_num / 10 << endl;
-      cout << "Нарушен синтаксис команды LET" << endl;
-      return -1;
+      if (polish_notation (fout, variable_list, str, str_num, i, this_address,
+                           variable_count)
+          == -1)
+        return -1;
     }
-  if ((ans = recursive_counting (fout, variable_list, str, str_num, i,
-                                 this_address, variable_count, max_coefficient,
-                                 min_coeff, &p))
-      == -1)
-    return -1;
   (*fout) << to_string ((*this_address)) << "  STORE  "
           << to_string ((*variable_list)[name]) << endl;
   *this_address = (*this_address) + 1;
@@ -1028,7 +1278,7 @@ if_func (ofstream *fout, map<char, int> *variable_list,
     }
   if (variablel == 0
       && variabler == 0) //Если условие не выполняется, то пропускаем строку с
-                         //IF и следующую команду
+                         // IF и следующую команду
     {
       int com = 0, fin = 0;
       if (sub2 == ">" && !(left > right))
